@@ -52,21 +52,21 @@ class Interpreter(memsize: Int = 1024,
     memory.copyToArray(newmemory)
     memory = newmemory
   }
-  
+
   private def evaluate(code: List[Any], innerBlock: Boolean): Unit = {
     for (c <- code) {
       c match {
         case '+' => memory(ptr) += 1
         case '-' => memory(ptr) -= 1
         case '>' => {
-          if(memory.length <= ptr)
-            expandMemory
           ptr += 1
+          if (memory.length <= ptr)
+            expandMemory
         }
         case '<' => {
-          if(ptr == 0)
-            throw new IllegalStateException("Pointer cannot be negative number")
           ptr -= 1
+          if (ptr < 0)
+            throw new IllegalStateException("Pointer cannot be negative number")
         }
         case '.' => write(memory(ptr))
         case ',' => memory(ptr) = read()
