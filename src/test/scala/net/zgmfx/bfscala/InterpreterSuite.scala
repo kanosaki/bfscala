@@ -60,7 +60,7 @@ class InterpreterSuite extends FunSuite {
   }
   test("Hello wrold!") {
     val streams = new BinaryStreams
-    val code = BfParser.parse("+++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.")
+    val code = BfParser.parse("+++++++++[>++\n++++++>++++++++++\t+>+  ++++<<<-]>.>++.+++++++..+++.>-.------------.<++++++++.--------.+++.------.--------.>+.")
     val interp = new Interpreter(memsize = 2, read = streams.input, write = streams.output)
     interp.run(code)
     assert(streams.toString === "Hello, world!")

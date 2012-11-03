@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 
 class ParserSuite extends FunSuite {
   test("Instructions") {
-    val result = BfParser.parse("+-><.,")
+    val result = BfParser.parse("+-><., ")
     assert(result === List('+', '-', '>', '<', '.', ','))
   }
 

@@ -74,6 +74,7 @@ class Interpreter(memsize: Int = 1024,
           if (memory(ptr) != 0)
             evaluate(block, true) // run block
         }
+        case _ => 
       }
     }
     if (memory(ptr) != 0 && innerBlock) evaluate(code, true) // retry
