@@ -2,3 +2,5 @@ target/
 .cache
 .settings/
 bin/
+.classpath
+.project
