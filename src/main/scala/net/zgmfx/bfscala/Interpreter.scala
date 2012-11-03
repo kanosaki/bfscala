@@ -49,7 +49,7 @@ class Interpreter(memsize: Int = 1024,
 
   private def expandMemory = {
     val newmemory = new Array[Int](memory.length * 2)
-    memory.copyToArray(newmemory)
+    Array.copy(memory, 0, newmemory, 0, memory.length)
     memory = newmemory
   }
 
