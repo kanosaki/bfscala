@@ -65,4 +65,14 @@ class InterpreterSuite extends FunSuite {
     interp.run(code)
     assert(streams.toString === "Hello, world!")
   }
+  test("Memory expanding") {
+    val code = BfParser.parse("+>>>+")
+    val streams = new BinaryStreams
+    val interp = new Interpreter(memsize = 2, read = streams.input, write = streams.output)
+    assert(interp.memory.length === 2)
+    interp.run(code)
+    assert(interp.memory.length === 4)
+    val targetMemArea = interp.memory.slice(0, 4)
+    assert(targetMemArea === Array(1, 0, 0, 1))
+  }
 }
