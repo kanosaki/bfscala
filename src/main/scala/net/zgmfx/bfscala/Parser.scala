@@ -2,11 +2,6 @@ package net.zgmfx.bfscala
 
 import scala.util.parsing.combinator.JavaTokenParsers
 
-abstract class Expr
-case class Inst(c: Char) extends Expr
-case class Block(insts: List[Expr]) extends Expr
-case class Code(cs: List[Expr]) extends Expr
-
 object BfParser extends JavaTokenParsers {
   override type Elem = Char
   val plus = elem("PLUS", _ == '+')

@@ -12,10 +12,13 @@ object DefaultStreams {
 }
 
 class BinaryStreams(waitInput: Boolean = false) {
+  
   val outBuffer: StringBuilder = new StringBuilder
   val inQueue: Queue[Int] = new Queue[Int]
+  
   def input(a: Any) = {
-    if (inQueue.isEmpty && !waitInput) throw new IllegalStateException("Input is empty")
+    if (inQueue.isEmpty && !waitInput) 
+      throw new IllegalStateException("Input is empty")
     inQueue.dequeue
   }
 
@@ -36,8 +39,10 @@ class BinaryStreams(waitInput: Boolean = false) {
 class Interpreter(memsize: Int = 1024,
                   read: Unit => Int = DefaultStreams.input,
                   write: Int => Unit = DefaultStreams.output) {
+  
   val memory = new Array[Int](memsize);
   var ptr = 0
+  
   def run(code: List[Any]): Unit = {
     evaluate(code, false)
   }
@@ -56,7 +61,6 @@ class Interpreter(memsize: Int = 1024,
             evaluate(x :: xs, true) // run block
         }
       }
-
     }
     if (memory(ptr) != 0 && innerBlock) evaluate(code, true) // retry
   }
