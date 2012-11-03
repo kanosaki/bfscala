@@ -70,9 +70,9 @@ class Interpreter(memsize: Int = 1024,
         }
         case '.' => write(memory(ptr))
         case ',' => memory(ptr) = read()
-        case (x :: xs) => {
+        case block: List[_] => {
           if (memory(ptr) != 0)
-            evaluate(x :: xs, true) // run block
+            evaluate(block, true) // run block
         }
       }
     }
