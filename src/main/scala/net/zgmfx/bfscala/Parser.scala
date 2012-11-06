@@ -7,7 +7,7 @@ object BfParser extends JavaTokenParsers {
   val baseInst = elem('+') | elem('-') | elem ('<') | elem('>') | elem('.') | elem(',') 
 
   val block: Parser[List[Any]] = '[' ~> code <~ ']'
-  val code: Parser[List[Any]] = rep(block | baseInst)
+  val code: Parser[List[Any]] = rep(baseInst | block)
 
   def parse(text: String) = {
     parseAll(code, text.replaceAll("\\s", "")).get

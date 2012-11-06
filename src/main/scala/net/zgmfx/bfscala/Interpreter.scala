@@ -43,8 +43,9 @@ class Interpreter(memsize: Int = 1024,
   var memory = new Array[Int](memsize);
   var ptr = 0
 
-  def run(code: List[Any]): Unit = {
+  def run(code: List[Any], flushNewLine: Boolean = false): Unit = {
     evaluate(code, false)
+    if(flushNewLine) write('\n')
   }
 
   private def expandMemory = {
@@ -74,7 +75,7 @@ class Interpreter(memsize: Int = 1024,
           if (memory(ptr) != 0)
             evaluate(block, true) // run block
         }
-        case _ => 
+        case _ => throw new IllegalArgumentException("Illegal token" + c)
       }
     }
     if (memory(ptr) != 0 && innerBlock) evaluate(code, true) // retry
