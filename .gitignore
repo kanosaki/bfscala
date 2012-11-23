@@ -6,3 +6,4 @@ bin/
 .project
 temp.c
 a.out*
+output.js

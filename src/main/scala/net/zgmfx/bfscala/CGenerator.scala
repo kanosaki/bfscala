@@ -12,6 +12,7 @@ class CGenerator(tempPath: String = "temp.c") extends Generator {
     Seq("indent", indentTemp, tempPath).!
     Seq("rm", indentTemp).!
     val result = Seq("gcc", "-O3", "-Wall", "-o", outPath, tempPath).!
+    Seq("rm", tempPath).!
     if (result != 0) {
       throw new RuntimeException("Compile failed")
     }

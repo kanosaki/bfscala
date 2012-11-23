@@ -4,10 +4,12 @@ assemblySettings
 
 name := "bfscala"
 
+resolvers += "sonatype-public" at "https://oss.sonatype.org/content/groups/public"
+
 libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "1.8" % "test",
     "commons-io" % "commons-io" % "2.4",
-    "org.fusesource.scalate" % "scalate-core" % "1.5.3"
+    "com.github.scopt" %% "scopt" % "2.1.0"
 )
 
 scalacOptions ++= Seq(
