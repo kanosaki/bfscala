@@ -7,7 +7,10 @@ import java.io.File
 class CGenerator(tempPath: String = "temp.c") {
   def compile(ast: Ast, outPath: String = "a.out") = {
     val cLangSource = generate(ast)
-    FileUtils.write(new File(tempPath), cLangSource)
+    val indentTemp = "temp_" + tempPath;
+    FileUtils.write(new File(indentTemp), cLangSource)
+    Seq("indent", indentTemp, tempPath).!
+    Seq("rm", indentTemp).!
     val result = Seq("gcc", "-O3", "-Wall", "-o", outPath, tempPath).!
     if (result != 0) {
       throw new RuntimeException("Compile failed")
@@ -22,7 +25,7 @@ class CGenerator(tempPath: String = "temp.c") {
     sb.toString
   }
 
-  def formatCode(sb: StringBuilder, code: List[Inst]): Unit = {
+  private def formatCode(sb: StringBuilder, code: List[Inst]): Unit = {
     for (c <- code) c match {
       case Inc(n)  => sb ++= templateInc.format(n)
       case Dec(n)  => sb ++= templateDec.format(n)
@@ -80,7 +83,8 @@ main(int argc, char** argv) {
 """
   val templateEnd = """printf("\n");
     return 0;
-    }"""
+    }
+    """
   val templateInc = "memory[ptr] += %d;\n"
   val templateDec = "memory[ptr] -= %d;\n"
   val templateFwd = "ptr += %d; check_memory();\n"
