@@ -43,9 +43,17 @@ class Interpreter(memsize: Int = 1024,
   var memory = new Array[Int](memsize);
   var ptr = 0
 
-  def run(code: List[Any], flushNewLine: Boolean = false): Unit = {
-    evaluate(code, false)
-    if(flushNewLine) write('\n')
+  def runRaw(code: List[Any], flushNewLine: Boolean = false): Unit = {
+    evalRaw(code, false)
+    if (flushNewLine) write('\n')
+  }
+
+  def run(code: String, flushNewLine: Boolean = false): Unit = {
+    val tokens = BfParser.parse(code);
+    val ast = new Ast(tokens)
+    val optimized = ast.code
+    eval(optimized, false)
+    if (flushNewLine) write('\n')
   }
 
   private def expandMemory = {
@@ -54,30 +62,65 @@ class Interpreter(memsize: Int = 1024,
     memory = newmemory
   }
 
-  private def evaluate(code: List[Any], innerBlock: Boolean): Unit = {
-    for (c <- code) {
-      c match {
-        case '+' => memory(ptr) += 1
-        case '-' => memory(ptr) -= 1
-        case '>' => {
-          ptr += 1
-          if (memory.length <= ptr)
-            expandMemory
-        }
-        case '<' => {
-          ptr -= 1
-          if (ptr < 0)
-            throw new IllegalStateException("Pointer cannot be negative number")
-        }
-        case '.' => write(memory(ptr))
-        case ',' => memory(ptr) = read()
-        case block: List[_] => {
-          if (memory(ptr) != 0)
-            evaluate(block, true) // run block
-        }
-        case _ => throw new IllegalArgumentException("Illegal token" + c)
+  protected def inc(n: Int): Unit = {
+    memory(ptr) += n;
+  }
+
+  protected def dec(n: Int): Unit = {
+    memory(ptr) -= n;
+  }
+
+  protected def foward(n: Int): Unit = {
+    ptr += n
+    if (memory.length <= ptr)
+      expandMemory
+  }
+
+  protected def back(n: Int): Unit = {
+    ptr -= n
+    if (ptr < 0)
+      throw new IllegalStateException("Pointer cannot be negative number")
+  }
+
+  protected def output = {
+    write(memory(ptr))
+  }
+
+  protected def input = {
+    memory(ptr) = read()
+  }
+
+  private def eval(code: List[Inst], innerBlock: Boolean): Unit = {
+    for (c <- code) c match {
+      case Inc(n)  => inc(n)
+      case Dec(n)  => dec(n)
+      case Fwd(n)  => foward(n)
+      case Back(n) => back(n)
+      case Write   => output
+      case Read    => input
+      case Block(insts) => {
+        if (memory(ptr) != 0)
+          eval(insts, true)
       }
+      case _ => throw new IllegalArgumentException("Illegal token" + c)
     }
-    if (memory(ptr) != 0 && innerBlock) evaluate(code, true) // retry
+    if (memory(ptr) != 0 && innerBlock) eval(code, true)
+  }
+
+  private def evalRaw(code: List[Any], innerBlock: Boolean): Unit = {
+    for (c <- code) c match {
+      case '+' => inc(1)
+      case '-' => dec(1)
+      case '>' => foward(1)
+      case '<' => back(1)
+      case '.' => output
+      case ',' => input
+      case block: List[_] => {
+        if (memory(ptr) != 0)
+          evalRaw(block, true) // run block
+      }
+      case _ => throw new IllegalArgumentException("Illegal token" + c)
+    }
+    if (memory(ptr) != 0 && innerBlock) evalRaw(code, true) // retry
   }
 }

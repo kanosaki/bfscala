@@ -13,7 +13,6 @@ object Main {
         FileUtils.readFileToString(new File(args(0)))
       else
         IOUtils.toString(System.in)
-    val code = BfParser.parse(src)
-    interp.run(code, true)
+    interp.run(src, true)
   }
 }
