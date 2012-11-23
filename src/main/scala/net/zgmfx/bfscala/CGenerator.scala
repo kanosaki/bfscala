@@ -25,7 +25,7 @@ class CGenerator(tempPath: String = "temp.c") extends Generator {
     sb.toString
   }
 
-  private def formatCode(sb: StringBuilder, code: List[Inst]): Unit = {
+  protected def formatCode(sb: StringBuilder, code: List[Inst]): Unit = {
     for (c <- code) c match {
       case Inc(n)  => sb ++= templateInc.format(n)
       case Dec(n)  => sb ++= templateDec.format(n)
