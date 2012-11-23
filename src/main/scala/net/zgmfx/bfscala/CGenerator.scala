@@ -4,8 +4,8 @@ import scala.sys.process._
 import org.apache.commons.io.FileUtils
 import java.io.File
 
-class CGenerator(tempPath: String = "temp.c") {
-  def compile(ast: Ast, outPath: String = "a.out") = {
+class CGenerator(tempPath: String = "temp.c") extends Generator {
+  override def compile(ast: Ast, outPath: String = "a.out") = {
     val cLangSource = generate(ast)
     val indentTemp = "temp_" + tempPath;
     FileUtils.write(new File(indentTemp), cLangSource)
