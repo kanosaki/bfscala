@@ -15,7 +15,7 @@ class JSGenerator(tempPath: String = "temp.js") extends CGenerator {
 var inputBuffer = [];
 process.stdin.resume();
 process.stdin.on('data', function(chunk){
-    for(var i = 0; i < chunk.length - 1; i++){
+    for(var i = 0; i < chunk.length; i++){
         inputBuffer.push(chunk[i]);
     }
     console.log(inputBuffer);
