@@ -42,12 +42,7 @@ class Interpreter(memsize: Int = 1024,
 
   var memory = new Array[Int](memsize);
   var ptr = 0
-
-  def runRaw(code: List[Any], flushNewLine: Boolean = false): Unit = {
-    evalRaw(code, false)
-    if (flushNewLine) write('\n')
-  }
-
+  
   def run(code: String, flushNewLine: Boolean = false): Unit = {
     val tokens = BfParser.parse(code);
     val ast = new Ast(tokens)

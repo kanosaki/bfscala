@@ -13,9 +13,28 @@ case object Write extends Inst
 case object Read extends Inst
 case class Block(code: List[Inst]) extends Inst
 
-class Ast(rawCode: List[Any]) {
-  lazy val translated: List[Inst] = translate(rawCode)
-  lazy val code = optimize(translated, Nil)
+class Ast(insts: List[Inst]) {
+  def code = insts
+}
+
+object AstHelper {
+  def optimize(code: List[Inst]): List[Inst] = optimizeCode(code, Nil)
+
+  private def optimizeCode(code: List[Inst], result: List[Inst]): List[Inst] = {
+    code match {
+      case Nil                          => result.reverse
+      case Inc(x) :: Inc(y) :: remain   => optimizeCode(Inc(x + y) :: remain, result)
+      case Dec(x) :: Dec(y) :: remain   => optimizeCode(Dec(x + y) :: remain, result)
+      case Fwd(x) :: Fwd(y) :: remain   => optimizeCode(Fwd(x + y) :: remain, result)
+      case Back(x) :: Back(y) :: remain => optimizeCode(Back(x + y) :: remain, result)
+      case Block(x) :: remain           => optimizeCode(remain, optimizeBlock(x) :: result)
+      case x :: remain                  => optimizeCode(remain, x :: result)
+    }
+  }
+
+  private def optimizeBlock(code: List[Inst]): Block = {
+    Block(optimizeCode(code, Nil))
+  }
 
   def translate(code: List[Any]): List[Inst] = {
     for (inst <- code) yield inst match {
@@ -28,21 +47,5 @@ class Ast(rawCode: List[Any]) {
       case block: List[_] => Block(translate(block))
       case _              => throw new IllegalArgumentException
     }
-  }
-
-  def optimize(code: List[Inst], result: List[Inst]): List[Inst] = {
-    code match {
-      case Nil                          => result.reverse
-      case Inc(x) :: Inc(y) :: remain   => optimize(Inc(x + y) :: remain, result)
-      case Dec(x) :: Dec(y) :: remain   => optimize(Dec(x + y) :: remain, result)
-      case Fwd(x) :: Fwd(y) :: remain   => optimize(Fwd(x + y) :: remain, result)
-      case Back(x) :: Back(y) :: remain => optimize(Back(x + y) :: remain, result)
-      case Block(x) :: remain           => optimize(remain, optimizeBlock(x) :: result)
-      case x :: remain                  => optimize(remain, x :: result)
-    }
-  }
-
-  def optimizeBlock(code: List[Inst]): Block = {
-    Block(optimize(code, Nil))
   }
 }
