@@ -1,5 +1,9 @@
 package net.zgmfx.bfscala
 
+import scala.collection.mutable.LinkedList
+import scala.collection.mutable.Buffer
+import scala.collection.mutable.ArrayBuffer
+
 abstract class Inst
 case class Inc(n: Int) extends Inst
 case class Dec(n: Int) extends Inst
@@ -11,7 +15,7 @@ case class Block(code: List[Inst]) extends Inst
 
 class Ast(rawCode: List[Any]) {
   lazy val translated: List[Inst] = translate(rawCode)
-  lazy val code = optimize(translated)
+  lazy val code = optimize(translated, Nil)
 
   def translate(code: List[Any]): List[Inst] = {
     for (inst <- code) yield inst match {
@@ -26,15 +30,19 @@ class Ast(rawCode: List[Any]) {
     }
   }
 
-  def optimize(code: List[Inst]): List[Inst] = {
+  def optimize(code: List[Inst], result: List[Inst]): List[Inst] = {
     code match {
-      case Inc(x) :: Inc(y) :: remain   => optimize(Inc(x + y) :: remain)
-      case Dec(x) :: Dec(y) :: remain   => optimize(Dec(x + y) :: remain)
-      case Fwd(x) :: Fwd(y) :: remain   => optimize(Fwd(x + y) :: remain)
-      case Back(x) :: Back(y) :: remain => optimize(Back(x + y) :: remain)
-      case Block(x) :: remain           => Block(optimize(x)) :: optimize(remain)
-      case x :: remain                  => x :: optimize(remain)
-      case Nil                          => Nil
+      case Nil                          => result.reverse
+      case Inc(x) :: Inc(y) :: remain   => optimize(Inc(x + y) :: remain, result)
+      case Dec(x) :: Dec(y) :: remain   => optimize(Dec(x + y) :: remain, result)
+      case Fwd(x) :: Fwd(y) :: remain   => optimize(Fwd(x + y) :: remain, result)
+      case Back(x) :: Back(y) :: remain => optimize(Back(x + y) :: remain, result)
+      case Block(x) :: remain           => optimize(remain, optimizeBlock(x) :: result)
+      case x :: remain                  => optimize(remain, x :: result)
     }
+  }
+
+  def optimizeBlock(code: List[Inst]): Block = {
+    Block(optimize(code, Nil))
   }
 }
