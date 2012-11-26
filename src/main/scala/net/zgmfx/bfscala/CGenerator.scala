@@ -4,7 +4,7 @@ import scala.sys.process._
 import org.apache.commons.io.FileUtils
 import java.io.File
 
-class CGenerator(tempPath: String = "temp.c") extends Generator {
+class CGenerator(keepTemp: Boolean = false, tempPath: String = "temp.c") extends Generator {
   override def compile(ast: Ast, outPath: String = "a.out") = {
     val cLangSource = generate(ast)
     val indentTemp = "temp_" + tempPath;
@@ -12,7 +12,8 @@ class CGenerator(tempPath: String = "temp.c") extends Generator {
     Seq("indent", indentTemp, tempPath).!
     Seq("rm", indentTemp).!
     val result = Seq("gcc", "-O3", "-Wall", "-o", outPath, tempPath).!
-    Seq("rm", tempPath).!
+    if (!keepTemp)
+      Seq("rm", tempPath).!
     if (result != 0) {
       throw new RuntimeException("Compile failed")
     }
