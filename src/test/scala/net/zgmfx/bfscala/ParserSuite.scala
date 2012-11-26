@@ -22,5 +22,4 @@ class ParserSuite extends FunSuite {
     val result = BfParser.parse("+-[><[++]-].")
     assert(result === List('+', '-', List('>', '<', List('+', '+'), '-'), '.'))
   }
-
 }

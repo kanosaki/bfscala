@@ -3,13 +3,15 @@ package net.zgmfx.bfscala
 import scala.util.parsing.combinator.JavaTokenParsers
 
 object BfParser extends JavaTokenParsers {
+  val insts = Seq('+', '-', '<', '>', '.', ',')
   override type Elem = Char
-  val baseInst = elem('+') | elem('-') | elem ('<') | elem('>') | elem('.') | elem(',') 
+  val pInsts = insts.map(elem(_)).reduce(_ | _);
+  // val baseInst = elem('+') | elem('-') | elem('<') | elem('>') | elem('.') | elem(',')
 
-  val block: Parser[List[Any]] = '[' ~> code <~ ']'
-  val code: Parser[List[Any]] = rep(baseInst | block)
+  val pBlock: Parser[List[Any]] = '[' ~> pCode <~ ']'
+  val pCode: Parser[List[Any]] = rep(pInsts | pBlock)
 
   def parse(text: String) = {
-    parseAll(code, text.replaceAll("\\s", "")).get
+    parseAll(pCode, text.replaceAll("\\s", "")).get
   }
 }
